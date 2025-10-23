@@ -73,7 +73,7 @@ const initialEdges: Edge[] = [
 ];
 
 const TradingFlow: React.FC = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [showCode, setShowCode] = useState(false);

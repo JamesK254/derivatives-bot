@@ -7,13 +7,11 @@ import { TradingNodeData, GeneratedCode } from '../types/trading.types';
  */
 export class TradingCodeGenerator {
   private nodes: Node<TradingNodeData>[];
-  private edges: Edge[];
   private nodeMap: Map<string, Node<TradingNodeData>>;
   private edgeMap: Map<string, Edge[]>;
 
   constructor(nodes: Node<TradingNodeData>[], edges: Edge[]) {
     this.nodes = nodes;
-    this.edges = edges;
     this.nodeMap = new Map(nodes.map(node => [node.id, node]));
 
     // Create edge map: nodeId -> outgoing edges
