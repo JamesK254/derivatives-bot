@@ -26,6 +26,7 @@ import { createNodeTypes, createNodeInstance } from './nodes/NodeFactory';
 import NodePalette from './components/NodePalette';
 import PropertyEditor from './components/PropertyEditor';
 import TemplateSelector from './components/TemplateSelector';
+import ImportBlockly from './components/ImportBlockly';
 import { NODE_DEFINITIONS, NodeDefinition, getNodeByType } from './config/nodeDefinitions';
 import { generateCode, validateFlow } from './utils/CodeGenerator';
 import { useUndoRedo } from './hooks/useUndoRedo';
@@ -57,6 +58,7 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [showImportBlockly, setShowImportBlockly] = useState(false);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
@@ -267,6 +269,17 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
     [setNodes, setEdges, clearHistory, takeSnapshot]
   );
 
+  // Handle Blockly import
+  const handleBlocklyImport = useCallback(
+    (nodes: Node[], edges: Edge[]) => {
+      setNodes(nodes);
+      setEdges(edges);
+      clearHistory();
+      setTimeout(takeSnapshot, 0);
+    },
+    [setNodes, setEdges, clearHistory, takeSnapshot]
+  );
+
   return (
     <div className="react-flow-bot-builder">
       {/* Node Palette */}
@@ -352,14 +365,24 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
                 </div>
               )}
               {!readOnly && (
-                <button
-                  onClick={() => setShowTemplateSelector(true)}
-                  className="btn btn--small btn--info"
-                  style={{ marginTop: 10, width: '100%' }}
-                  title="Load strategy template"
-                >
-                  📋 Templates
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowTemplateSelector(true)}
+                    className="btn btn--small btn--info"
+                    style={{ marginTop: 10, width: '100%' }}
+                    title="Load strategy template"
+                  >
+                    📋 Templates
+                  </button>
+                  <button
+                    onClick={() => setShowImportBlockly(true)}
+                    className="btn btn--small btn--warning"
+                    style={{ marginTop: 8, width: '100%' }}
+                    title="Import Blockly XML"
+                  >
+                    📥 Import Blockly
+                  </button>
+                </>
               )}
             </div>
           </Panel>
@@ -411,6 +434,14 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
         <TemplateSelector
           onSelectTemplate={handleTemplateSelect}
           onClose={() => setShowTemplateSelector(false)}
+        />
+      )}
+
+      {/* Import Blockly */}
+      {showImportBlockly && (
+        <ImportBlockly
+          onImport={handleBlocklyImport}
+          onClose={() => setShowImportBlockly(false)}
         />
       )}
     </div>
