@@ -1,0 +1,365 @@
+/**
+ * Template Selector Styles
+ */
+
+.template-selector {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  &__modal {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+    }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #111827;
+    }
+  }
+
+  &__controls {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__search {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__filter {
+    padding: 6px 16px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    &.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+  }
+
+  &__grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    align-content: start;
+  }
+
+  &__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+
+    p {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+
+  &__card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      transform: translateY(-2px);
+    }
+
+    &--beginner {
+      &:hover {
+        border-color: #10b981;
+      }
+    }
+
+    &--intermediate {
+      &:hover {
+        border-color: #f59e0b;
+      }
+    }
+
+    &--advanced {
+      &:hover {
+        border-color: #ef4444;
+      }
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+      flex: 1;
+    }
+  }
+
+  &__badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+
+    &--beginner {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--intermediate {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &--advanced {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  }
+
+  &__description {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  &__tag {
+    padding: 4px 10px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  &__stats {
+    display: flex;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 13px;
+    color: #9ca3af;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+
+  &__footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .template-selector {
+    &__modal {
+      background: #1f2937;
+    }
+
+    &__header {
+      border-bottom-color: #374151;
+
+      h2 {
+        color: #f9fafb;
+      }
+    }
+
+    &__close {
+      color: #9ca3af;
+
+      &:hover {
+        background: #374151;
+        color: #f9fafb;
+      }
+    }
+
+    &__controls {
+      border-bottom-color: #374151;
+    }
+
+    &__search {
+      background: #374151;
+      border-color: #4b5563;
+      color: #f9fafb;
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+
+      &:focus {
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+      }
+    }
+
+    &__filter {
+      background: #374151;
+      border-color: #4b5563;
+      color: #9ca3af;
+
+      &:hover {
+        border-color: #60a5fa;
+        color: #60a5fa;
+      }
+
+      &.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+      }
+    }
+
+    &__card {
+      background: #374151;
+      border-color: #4b5563;
+
+      &:hover {
+        border-color: #60a5fa;
+        box-shadow: 0 4px 12px rgba(96, 165, 250, 0.15);
+      }
+    }
+
+    &__card-header h3 {
+      color: #f9fafb;
+    }
+
+    &__description {
+      color: #d1d5db;
+    }
+
+    &__tag {
+      background: #4b5563;
+      color: #d1d5db;
+    }
+
+    &__stats {
+      border-top-color: #4b5563;
+      color: #9ca3af;
+    }
+
+    &__footer {
+      background: #111827;
+      border-top-color: #374151;
+
+      p {
+        color: #9ca3af;
+      }
+    }
+  }
+}

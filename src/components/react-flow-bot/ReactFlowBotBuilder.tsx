@@ -25,9 +25,11 @@ import 'reactflow/dist/style.css';
 import { createNodeTypes, createNodeInstance } from './nodes/NodeFactory';
 import NodePalette from './components/NodePalette';
 import PropertyEditor from './components/PropertyEditor';
+import TemplateSelector from './components/TemplateSelector';
 import { NODE_DEFINITIONS, NodeDefinition, getNodeByType } from './config/nodeDefinitions';
 import { generateCode, validateFlow } from './utils/CodeGenerator';
 import { useUndoRedo } from './hooks/useUndoRedo';
+import { StrategyTemplate } from './config/templates';
 
 import './ReactFlowBotBuilder.scss';
 
@@ -54,6 +56,7 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
   const [generatedCode, setGeneratedCode] = useState('');
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
@@ -253,6 +256,17 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
     }
   }, [setNodes, setEdges, clearHistory]);
 
+  // Handle template selection
+  const handleTemplateSelect = useCallback(
+    (template: StrategyTemplate) => {
+      setNodes(template.nodes);
+      setEdges(template.edges);
+      clearHistory();
+      setTimeout(takeSnapshot, 0);
+    },
+    [setNodes, setEdges, clearHistory, takeSnapshot]
+  );
+
   return (
     <div className="react-flow-bot-builder">
       {/* Node Palette */}
@@ -337,6 +351,16 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
                   ⚠️ {validationErrors.length} error{validationErrors.length !== 1 ? 's' : ''}
                 </div>
               )}
+              {!readOnly && (
+                <button
+                  onClick={() => setShowTemplateSelector(true)}
+                  className="btn btn--small btn--info"
+                  style={{ marginTop: 10, width: '100%' }}
+                  title="Load strategy template"
+                >
+                  📋 Templates
+                </button>
+              )}
             </div>
           </Panel>
         </ReactFlow>
@@ -379,6 +403,14 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
           onUpdateNode={onUpdateNode}
           onClose={() => setShowPropertyEditor(false)}
           variables={[]} // TODO: Extract from nodes
+        />
+      )}
+
+      {/* Template Selector */}
+      {showTemplateSelector && (
+        <TemplateSelector
+          onSelectTemplate={handleTemplateSelect}
+          onClose={() => setShowTemplateSelector(false)}
         />
       )}
     </div>
