@@ -3,6 +3,10 @@
  * Replaces all 148 Blockly blocks with React Flow nodes
  */
 
+import { ADDITIONAL_NODE_DEFINITIONS } from './additionalNodeDefinitions';
+import { MORE_NODE_DEFINITIONS } from './moreNodeDefinitions';
+import { FINAL_NODE_DEFINITIONS } from './finalNodeDefinitions';
+
 export type NodeCategory =
   | 'trade_parameters'
   | 'purchase_conditions'
@@ -694,6 +698,322 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
       return `${data.variable || 'item'} = ${inputs.value || '0'};\n`;
     },
   },
+
+  // ===================================================================
+  // REMAINING TRADE PARAMETERS (5 nodes)
+  // ===================================================================
+
+  trade_definition_multiplier: {
+    id: 'trade_definition_multiplier',
+    type: 'trade_definition_multiplier',
+    label: 'Multiplier Options',
+    category: 'trade_parameters',
+    description: 'Options for multiplier trades',
+    color: '#667eea',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'amount-input', type: 'target', position: 'left', label: 'Amount', dataType: 'value' },
+      { id: 'stop_loss-input', type: 'target', position: 'left', label: 'Stop Loss', dataType: 'value' },
+      { id: 'take_profit-input', type: 'target', position: 'left', label: 'Take Profit', dataType: 'value' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [
+      { name: 'amount', type: 'number', label: 'Amount', defaultValue: 10, min: 1 },
+      { name: 'stop_loss', type: 'number', label: 'Stop Loss', defaultValue: 0 },
+      { name: 'take_profit', type: 'number', label: 'Take Profit', defaultValue: 0 },
+    ],
+    keywords: ['multiplier', 'stop', 'loss', 'take', 'profit'],
+    codeGenerator: (data, inputs) => {
+      let code = `tradeConfig.amount = ${inputs['amount-input'] || data.amount};\n`;
+      if (inputs['stop_loss-input'] || data.stop_loss) {
+        code += `tradeConfig.stop_loss = ${inputs['stop_loss-input'] || data.stop_loss};\n`;
+      }
+      if (inputs['take_profit-input'] || data.take_profit) {
+        code += `tradeConfig.take_profit = ${inputs['take_profit-input'] || data.take_profit};\n`;
+      }
+      return code;
+    },
+  },
+
+  trade_definition_accumulator: {
+    id: 'trade_definition_accumulator',
+    type: 'trade_definition_accumulator',
+    label: 'Accumulator Options',
+    category: 'trade_parameters',
+    description: 'Options for accumulator trades',
+    color: '#667eea',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'growth_rate-input', type: 'target', position: 'left', label: 'Growth Rate', dataType: 'value' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [
+      { name: 'growth_rate', type: 'number', label: 'Growth Rate %', defaultValue: 1, min: 1, max: 5 },
+    ],
+    keywords: ['accumulator', 'growth'],
+    codeGenerator: (data, inputs) => {
+      return `tradeConfig.growth_rate = ${inputs['growth_rate-input'] || data.growth_rate};\n`;
+    },
+  },
+
+  trade_definition_candleinterval: {
+    id: 'trade_definition_candleinterval',
+    type: 'trade_definition_candleinterval',
+    label: 'Candle Interval',
+    category: 'trade_parameters',
+    description: 'Set candle interval for chart',
+    color: '#667eea',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [
+      {
+        name: 'interval',
+        type: 'dropdown',
+        label: 'Interval',
+        defaultValue: '60',
+        options: [
+          { value: '60', label: '1 minute' },
+          { value: '120', label: '2 minutes' },
+          { value: '180', label: '3 minutes' },
+          { value: '300', label: '5 minutes' },
+          { value: '600', label: '10 minutes' },
+          { value: '900', label: '15 minutes' },
+          { value: '1800', label: '30 minutes' },
+          { value: '3600', label: '1 hour' },
+          { value: '14400', label: '4 hours' },
+          { value: '86400', label: '1 day' },
+        ]
+      }
+    ],
+    keywords: ['candle', 'interval', 'timeframe'],
+    codeGenerator: (data) => `tradeConfig.candleInterval = ${data.interval};\n`,
+  },
+
+  trade_definition_restartbuysell: {
+    id: 'trade_definition_restartbuysell',
+    type: 'trade_definition_restartbuysell',
+    label: 'Restart Buy/Sell',
+    category: 'trade_parameters',
+    description: 'Enable restart on buy/sell',
+    color: '#667eea',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [
+      { name: 'enabled', type: 'checkbox', label: 'Enable', defaultValue: false }
+    ],
+    keywords: ['restart', 'buy', 'sell'],
+    codeGenerator: (data) => `tradeConfig.restartBuySell = ${data.enabled};\n`,
+  },
+
+  trade_definition_restartonerror: {
+    id: 'trade_definition_restartonerror',
+    type: 'trade_definition_restartonerror',
+    label: 'Restart On Error',
+    category: 'trade_parameters',
+    description: 'Enable restart on error',
+    color: '#667eea',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [
+      { name: 'enabled', type: 'checkbox', label: 'Enable', defaultValue: false }
+    ],
+    keywords: ['restart', 'error'],
+    codeGenerator: (data) => `tradeConfig.restartOnError = ${data.enabled};\n`,
+  },
+
+  // ===================================================================
+  // SELL CONDITIONS (4 nodes)
+  // ===================================================================
+
+  during_purchase: {
+    id: 'during_purchase',
+    type: 'during_purchase',
+    label: 'Sell Conditions',
+    category: 'sell_conditions',
+    description: 'Conditions to check during purchase',
+    color: '#4facfe',
+    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    icon: '⏱️',
+    singleInstance: true,
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'statement', type: 'target', position: 'left', label: 'Do', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [],
+    keywords: ['during', 'purchase', 'sell', 'conditions'],
+    codeGenerator: (data, inputs) => {
+      return `\n// During Purchase\nasync function duringPurchase(contract) {\n${inputs.statement || '  // Monitoring trade'}\n}\n`;
+    },
+  },
+
+  check_sell: {
+    id: 'check_sell',
+    type: 'check_sell',
+    label: 'Check Sell',
+    category: 'sell_conditions',
+    description: 'Check if sell conditions are met',
+    color: '#4facfe',
+    handles: [
+      { id: 'output', type: 'source', position: 'right', dataType: 'value' }
+    ],
+    fields: [
+      {
+        name: 'sell_type',
+        type: 'dropdown',
+        label: 'Sell Type',
+        defaultValue: 'profit',
+        options: [
+          { value: 'profit', label: 'Sell at profit' },
+          { value: 'loss', label: 'Sell at loss' },
+        ]
+      }
+    ],
+    keywords: ['check', 'sell', 'profit', 'loss'],
+    codeGenerator: (data) => `Bot.checkSell('${data.sell_type}')`,
+  },
+
+  sell_at_market: {
+    id: 'sell_at_market',
+    type: 'sell_at_market',
+    label: 'Sell at Market',
+    category: 'sell_conditions',
+    description: 'Sell contract at market price',
+    color: '#4facfe',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [],
+    keywords: ['sell', 'market', 'close'],
+    codeGenerator: () => `await Bot.sellAtMarket();\n`,
+  },
+
+  sell_price: {
+    id: 'sell_price',
+    type: 'sell_price',
+    label: 'Sell Price',
+    category: 'sell_conditions',
+    description: 'Get current sell price',
+    color: '#4facfe',
+    handles: [
+      { id: 'output', type: 'source', position: 'right', dataType: 'value' }
+    ],
+    fields: [],
+    keywords: ['sell', 'price', 'value'],
+    codeGenerator: () => 'Bot.getSellPrice()',
+  },
+
+  // ===================================================================
+  // TRADE RESULTS (4 nodes)
+  // ===================================================================
+
+  after_purchase: {
+    id: 'after_purchase',
+    type: 'after_purchase',
+    label: 'Trade Results',
+    category: 'trade_results',
+    description: 'Actions after trade completes',
+    color: '#43e97b',
+    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    icon: '✅',
+    singleInstance: true,
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'statement', type: 'target', position: 'left', label: 'Do', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [],
+    keywords: ['after', 'purchase', 'results', 'complete'],
+    codeGenerator: (data, inputs) => {
+      return `\n// After Purchase\nasync function afterPurchase(contract) {\n  context.totalRuns++;\n${inputs.statement || '  // Handle trade results'}\n}\n`;
+    },
+  },
+
+  trade_again: {
+    id: 'trade_again',
+    type: 'trade_again',
+    label: 'Trade Again',
+    category: 'trade_results',
+    description: 'Execute another trade',
+    color: '#43e97b',
+    handles: [
+      { id: 'input', type: 'target', position: 'top', dataType: 'statement' },
+      { id: 'output', type: 'source', position: 'bottom', dataType: 'statement' }
+    ],
+    fields: [],
+    keywords: ['trade', 'again', 'repeat'],
+    codeGenerator: () => `await Bot.tradeAgain();\n`,
+  },
+
+  check_result: {
+    id: 'check_result',
+    type: 'check_result',
+    label: 'Check Result',
+    category: 'trade_results',
+    description: 'Check if trade won or lost',
+    color: '#43e97b',
+    handles: [
+      { id: 'output', type: 'source', position: 'right', dataType: 'value' }
+    ],
+    fields: [
+      {
+        name: 'result_type',
+        type: 'dropdown',
+        label: 'Type',
+        defaultValue: 'WIN',
+        options: [
+          { value: 'WIN', label: 'Win' },
+          { value: 'LOSS', label: 'Loss' },
+        ]
+      }
+    ],
+    keywords: ['check', 'result', 'win', 'loss'],
+    codeGenerator: (data) => `(contract.profit ${data.result_type === 'WIN' ? '>' : '<'} 0)`,
+  },
+
+  read_details: {
+    id: 'read_details',
+    type: 'read_details',
+    label: 'Read Details',
+    category: 'trade_results',
+    description: 'Read trade details',
+    color: '#43e97b',
+    handles: [
+      { id: 'output', type: 'source', position: 'right', dataType: 'value' }
+    ],
+    fields: [
+      {
+        name: 'detail_type',
+        type: 'dropdown',
+        label: 'Detail',
+        defaultValue: 'profit',
+        options: [
+          { value: 'profit', label: 'Profit' },
+          { value: 'payout', label: 'Payout' },
+          { value: 'entry_tick', label: 'Entry Tick' },
+          { value: 'exit_tick', label: 'Exit Tick' },
+        ]
+      }
+    ],
+    keywords: ['read', 'details', 'profit', 'payout'],
+    codeGenerator: (data) => `contract.${data.detail_type}`,
+  },
+
+  // Merge additional node definitions (loops, math, text, misc)
+  ...ADDITIONAL_NODE_DEFINITIONS,
+
+  // Merge more node definitions (indicators, tick analysis, lists, functions, time, candles)
+  ...MORE_NODE_DEFINITIONS,
+
+  // Merge final node definitions (remaining critical nodes)
+  ...FINAL_NODE_DEFINITIONS,
 };
 
 // Export helper functions
