@@ -27,6 +27,7 @@ import NodePalette from './components/NodePalette';
 import PropertyEditor from './components/PropertyEditor';
 import { NODE_DEFINITIONS, NodeDefinition, getNodeByType } from './config/nodeDefinitions';
 import { generateCode, validateFlow } from './utils/CodeGenerator';
+import { useUndoRedo } from './hooks/useUndoRedo';
 
 import './ReactFlowBotBuilder.scss';
 
@@ -59,12 +60,45 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
 
   const nodeTypes = React.useMemo(() => createNodeTypes(NODE_DEFINITIONS), []);
 
+  // Undo/Redo functionality
+  const { undo, redo, canUndo, canRedo, takeSnapshot, clear: clearHistory } = useUndoRedo(
+    nodes,
+    edges,
+    setNodes,
+    setEdges
+  );
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Undo: Ctrl+Z or Cmd+Z
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+      }
+      // Redo: Ctrl+Shift+Z, Cmd+Shift+Z, or Ctrl+Y
+      else if (
+        ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'z') ||
+        (event.ctrlKey && event.key === 'y')
+      ) {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    if (!readOnly) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [undo, redo, readOnly]);
+
   // Handle connection between nodes
   const onConnect: OnConnect = useCallback(
     (connection: Connection) => {
       setEdges((eds) => addEdge(connection, eds));
+      setTimeout(takeSnapshot, 0);
     },
-    [setEdges]
+    [setEdges, takeSnapshot]
   );
 
   // Handle node click
@@ -95,8 +129,9 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
 
       const newNode = createNodeInstance(definition, position);
       setNodes((nds) => [...nds, newNode]);
+      setTimeout(takeSnapshot, 0);
     },
-    [nodes, reactFlowInstance, setNodes]
+    [nodes, reactFlowInstance, setNodes, takeSnapshot]
   );
 
   // Handle drag and drop from palette
@@ -133,8 +168,9 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
 
       const newNode = createNodeInstance(definition, position);
       setNodes((nds) => [...nds, newNode]);
+      setTimeout(takeSnapshot, 0);
     },
-    [nodes, reactFlowInstance, setNodes]
+    [nodes, reactFlowInstance, setNodes, takeSnapshot]
   );
 
   // Update node properties
@@ -154,8 +190,9 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
           return node;
         })
       );
+      setTimeout(takeSnapshot, 0);
     },
-    [setNodes]
+    [setNodes, takeSnapshot]
   );
 
   // Handle code generation
@@ -212,8 +249,9 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
     if (confirm('Are you sure you want to clear the workspace? This cannot be undone.')) {
       setNodes([]);
       setEdges([]);
+      clearHistory();
     }
-  }, [setNodes, setEdges]);
+  }, [setNodes, setEdges, clearHistory]);
 
   return (
     <div className="react-flow-bot-builder">
@@ -254,6 +292,22 @@ const ReactFlowBotBuilderInner: React.FC<ReactFlowBotBuilderProps> = ({
           {!readOnly && (
             <Panel position="top-right" style={{ margin: 10 }}>
               <div className="react-flow-bot-builder__actions">
+                <button
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className="btn btn--secondary"
+                  title="Undo (Ctrl+Z)"
+                >
+                  ↶ Undo
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className="btn btn--secondary"
+                  title="Redo (Ctrl+Y)"
+                >
+                  ↷ Redo
+                </button>
                 <button onClick={handleValidate} className="btn btn--secondary" title="Validate flow">
                   ✓ Validate
                 </button>
